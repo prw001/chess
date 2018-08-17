@@ -11,13 +11,16 @@ class GameBoard
 	end
 
 	def initialize
-		squares = create_rows
+		@squares = create_rows
 	end
 
 	def square_at(coordinates)
-		return squares[coordinates[0]][coordinates[1]]
+		if coordinates[0] >= 0 && coordinates[1] >= 0
+			return @squares[coordinates[0]][coordinates[1]]
+		else
+			return nil
+		end
 	end
-
 end
 
 class ChessSquare
