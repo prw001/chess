@@ -3,15 +3,15 @@ require 'GameBoard.rb'
 
 describe "#take_piece" do 
 	context "when one piece attacks another" do 
-		defending_piece = GamePiece.new([0, 0])
-		attacking_piece = GamePiece.new([1, 1])
+		defending_piece = GamePiece.new([0, 0], 'b')
+		attacking_piece = GamePiece.new([1, 1], 'w')
 
 		it "removes the defending piece's position" do 
 			attacking_piece.take_piece(defending_piece)
 			expect(defending_piece.position).to eql(nil)
 		end
 
-		it "changes the defender's 'taken' attribute" do 
+		it "changes the defender's 'is_taken' attribute" do 
 			expect(defending_piece.is_taken).to eql(true)
 		end
 	end
@@ -21,7 +21,7 @@ describe "#move" do
 	context "when a piece is moved" do 
 		from_square = ChessSquare.new([0, 0])
 		to_square = ChessSquare.new([1, 1])
-		active_piece = GamePiece.new(from_square)
+		active_piece = GamePiece.new(from_square, 'w')
 		from_square.occupant = active_piece
 		it "updates its position" do 
 			active_piece.move(to_square)
@@ -35,7 +35,7 @@ describe "#move" do
 
 		it "takes any piece occupying that square" do 
 			active_piece.move(from_square)
-			passive_piece = GamePiece.new(to_square)
+			passive_piece = GamePiece.new(to_square, 'b')
 			to_square.occupant = passive_piece
 			active_piece.move(to_square)
 
