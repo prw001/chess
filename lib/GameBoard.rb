@@ -22,10 +22,9 @@ end
 
 class ChessSquare
 	attr_reader :coordinates
-	attr_accessor :is_occupied
-
-	def initialize(coordinates)
+	attr_accessor :occupant
+	def initialize(coordinates, occupant = nil)
 		@coordinates = coordinates
-		@is_occupied = false
+		@occupant = occupant
 	end
 end

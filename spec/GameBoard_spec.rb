@@ -3,6 +3,7 @@ require 'GameBoard.rb'
 describe "#create_rows" do
 	game_board = GameBoard.new
 	rows = game_board.create_rows 
+	
 	it "returns an array" do 
 		expect(rows).to be_an_instance_of(Array)
 	end
