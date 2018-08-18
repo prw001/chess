@@ -29,15 +29,17 @@ class GamePiece
 end
 
 class Pawn < GamePiece
-	def initialize
-		super
+	attr_accessor :first_move
+	def initialize(position, color)
+		super(position, color)
 		@first_move = true
 	end
 end
 
 class Rook < GamePiece
-	def initialize
-		super
+	attr_accessor :first_move
+	def initialize(position, color)
+		super(position, color)
 		@first_move = true
 	end
 end
@@ -55,8 +57,9 @@ class Queen < GamePiece
 end
 
 class King < GamePiece
-	def initialize
-		super
+	attr_accessor :first_move
+	def initialize(position, color)
+		super(position, color)
 		@first_move = true
 	end
 end
