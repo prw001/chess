@@ -5,28 +5,28 @@ end
 module PieceMoves
 
 	def get_next_coordinates(origin, direction)
-		next_coordinates = origin
+		next_coordinates = origin.dup
 		case direction
 		when 'N'
-			next_coordinates[1] -= 1
+			next_coordinates[0] -= 1
 		when 'NE'
-			next_coordinates[0] += 1
-			next_coordinates[1] -= 1
+			next_coordinates[1] += 1
+			next_coordinates[0] -= 1
 		when 'E'
-			next_coordinates[0] += 1
+			next_coordinates[1] += 1
 		when 'SE'
+			next_coordinates[1] += 1
 			next_coordinates[0] += 1
-			next_coordinates[1] += 1
 		when 'S'
-			next_coordinates[1] += 1
+			next_coordinates[0] += 1
 		when 'SW'
-			next_coordinates[0] -= 1
-			next_coordinates[1] += 1
-		when 'W'
-			next_coordinates[0] -= 1
-		when 'NW'
-			next_coordinates[0] -= 1
 			next_coordinates[1] -= 1
+			next_coordinates[0] += 1
+		when 'W'
+			next_coordinates[1] -= 1
+		when 'NW'
+			next_coordinates[1] -= 1
+			next_coordinates[0] -= 1
 		else
 			next_coordinates = nil
 		end
@@ -37,15 +37,15 @@ module PieceMoves
 	def get_pawn_moves(board, pawn)
 		moveset = []
 		origin = pawn.position.coordinates
-		next_coordinates = origin
+		next_coordinates = origin.dup
 
-		pawn.color == 'w' ? directions = ['N', 'NE', 'NW'] : directions = ['S', 'SE', 'SW']
-		pawn.first_move == true ? move_delta = 2 : move_delta = 1
+		pawn.color == 'w' ? directions = ['N', 'NE', 'NW'] : directions = ['S', 'SE', 'SW'] 
+		pawn.first_move == true ? move_delta = 2 : move_delta = 1 
 		
 		move_delta.times do #vertical moves
 			next_coordinates = get_next_coordinates(next_coordinates, directions[0])
 			next_square = board.square_at(next_coordinates)
-			if next_square && !(next_square.occupant)
+			if next_square && (next_square.occupant == nil)
 				moveset << next_square
 			else
 				break
