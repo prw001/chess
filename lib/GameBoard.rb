@@ -15,7 +15,8 @@ class GameBoard
 	end
 
 	def square_at(coordinates)
-		if coordinates[0] >= 0 && coordinates[1] >= 0
+		if (coordinates[0] >= 0 && coordinates[0] < 8) &&
+		   (coordinates[1] >= 0 && coordinates[1] < 8)
 			return @squares[coordinates[0]][coordinates[1]]
 		else
 			return nil
