@@ -1,4 +1,4 @@
-require './GameTools.rb'
+require 'GameTools.rb'
 
 def play(game)
 	game.display
