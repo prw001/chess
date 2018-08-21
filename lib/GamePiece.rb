@@ -1,10 +1,12 @@
-require './PieceMoves.rb'
+require 'PieceMoves.rb'
+require 'GameTools.rb'
 
 class GamePiece
 	attr_reader :position
 	attr_reader :is_taken
 	attr_reader :color
-	
+	include PieceMoves
+	include GameTools
 	def initialize(game, position, color)
 		@position = position
 		@is_taken = false
@@ -22,21 +24,26 @@ class GamePiece
 	end
 
 	def get_valid_moves(directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])
-		include PieceMoves
+		
 		moves = []
 		directions.each do |direction|
 			next_coord = @position.coordinates.dup
 			loop do 
-				next_coord = get_next_coordinates(origin, direction)
-				if @game.square_at(next_coord).occupant == nil
-					moves << @game.square_at(next_coord)
-				elsif @game.square_at(next_coord).occupant.color != @color
-					moves << @game.square_at(next_coord)
+				next_coord = get_next_coordinates(next_coord, direction)
+				if @game.square_at(next_coord)
+					if @game.square_at(next_coord).occupant == nil
+						moves << @game.square_at(next_coord)
+					elsif @game.square_at(next_coord).occupant.color != @color
+						moves << @game.square_at(next_coord)
+						break
+					else
+						break
+					end
 				else
 					break
 				end
-			end
-		end	
+			end	
+		end
 		return moves	
 	end
 
@@ -65,7 +72,6 @@ class Pawn < GamePiece
 	end
 
 	def get_valid_moves
-		include PieceMoves
 		moveset = []
 		next_coord = @position.coordinates.dup
 
@@ -74,7 +80,7 @@ class Pawn < GamePiece
 
 		move_delta.times do #vertical moves
 			next_coord = get_next_coordinates(next_coord, directions[0])
-			next_square = board.square_at(next_coord)
+			next_square = @game.square_at(next_coord)
 			if next_square && !(next_square.occupant)
 				moveset << next_square
 			else
@@ -84,9 +90,10 @@ class Pawn < GamePiece
 
 		2.times do |index| #diagonal attacks
 			origin = @position.coordinates
-			next_square = board.square_at(get_next_coordinates(origin, directions[index + 1]))
-			if next_square && next_square.occupant && next_square.occupant.color != @color
-				moveset << next_square
+			next_square = @game.square_at(get_next_coordinates(origin, directions[index + 1]))
+			if next_square && next_square.occupant && 
+			   next_square.occupant.color != @color
+					moveset << next_square
 			end
 		end
 
@@ -97,6 +104,7 @@ end
 class Rook < GamePiece
 	attr_accessor :first_move
 	attr_reader :symbol
+	#include PieceMoves
 	def initialize(game, position, color)
 		super(game, position, color)
 		@first_move = true
@@ -108,13 +116,13 @@ class Rook < GamePiece
 	end
 
 	def get_valid_moves(directions = ['N', 'E', 'S', 'W'])
-		include PieceMoves
 		super
 	end
 end
 
 class Knight < GamePiece
 	attr_reader :symbol
+	include PieceMoves
 	def initialize(game, position, color)
 		super(game, position, color)
 		if @color == 'w'
@@ -125,7 +133,6 @@ class Knight < GamePiece
 	end
 
 	def get_valid_moves
-		include PieceMoves
 		moveset = []
 		coord_shifts = [[2, -1], [2, 1],
 				[1, 2], [-1, 2],
@@ -133,7 +140,7 @@ class Knight < GamePiece
 				[1, -2], [-1, -2]]
 
 		coord_shifts.each do |shift|
-			next_square = game.square_at(combine_coord(start, shift))
+			next_square = @game.square_at(combine_coordinates(@position.coordinates, shift))
 			if next_square && next_square.occupant == nil
 				moveset << next_square
 			elsif next_square && next_square.occupant && next_square.occupant.color != @color
@@ -148,6 +155,7 @@ end
 
 class Bishop < GamePiece
 	attr_reader :symbol
+	include PieceMoves
 	def initialize(game, position, color)
 		super(game, position, color)
 		if @color == 'w'
@@ -158,7 +166,6 @@ class Bishop < GamePiece
 	end
 
 	def get_valid_moves(directions = ['NW', 'SE', 'SW', 'NE'])
-		include PieceMoves
 		super
 	end
 end
@@ -178,6 +185,7 @@ end
 class King < GamePiece
 	attr_reader :symbol
 	attr_accessor :first_move
+	include PieceMoves
 	def initialize(game, position, color)
 		super(game, position, color)
 		@first_move = true
@@ -189,15 +197,14 @@ class King < GamePiece
 	end
 
 	def get_valid_moves(directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])
-		include PieceMoves
 		moveset = []
 		origin = @position.coordinates
 		directions.each do |direction|
-			next_square = game.square_at(get_next_coordinates(origin, direction))
-			if next_square && next_square.occupant == nil && !(is_in_check)
+			next_square = @game.square_at(get_next_coordinates(origin, direction))
+			if next_square && next_square.occupant == nil && !(is_in_check(@color, @game, next_square))
 				moveset << next_square
 			elsif next_square && next_square.occupant && 
-				  next_square.occupant.color != @color && !(is_in_check(@color, game, next_square))
+				  next_square.occupant.color != @color && !(is_in_check(@color, @game, next_square))
 				  	moveset << next_square
 			else
 				next
