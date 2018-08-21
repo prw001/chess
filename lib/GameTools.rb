@@ -1,7 +1,17 @@
-require './GameBoard.rb'
-require './GamePiece.rb'
+require 'GameBoard.rb'
+require 'GamePiece.rb'
+require 'PieceMoves.rb'
 
 module GameTools
+	include PieceMoves
+	def deep_copy(rows)
+		rows_copy = []
+		rows.each do |row|
+			rows_copy << row.dup
+		end
+		return rows_copy
+	end
+
 	def create
 		game = GameBoard.new
 		black_pieces = [
@@ -42,6 +52,20 @@ module GameTools
 			piece.position.occupant = piece
 		end
 
+		game.white_pieces = white_pieces
+		game.black_pieces = black_pieces
 		return game
+	end
+
+	def puts_king_in_check(game, active_piece, destination)
+		mock_game = GameBoard.new(game.black_pieces, game.white_pieces, deep_copy(game.rows))
+		from_square = mock_game.square_at(active_piece.position.coordinates)
+		from_square.occupant = nil
+		mock_game.square_at(destination.coordinates).occupant = active_piece
+		if active_piece.color == 'w'
+			return is_in_check('w', mock_game, game.white_pieces[4].position)
+		else
+			return is_in_check('b', mock_game, game.black_pieces[4].position)
+		end
 	end
 end
