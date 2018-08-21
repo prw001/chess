@@ -104,7 +104,7 @@ end
 class Rook < GamePiece
 	attr_accessor :first_move
 	attr_reader :symbol
-	#include PieceMoves
+	include PieceMoves
 	def initialize(game, position, color)
 		super(game, position, color)
 		@first_move = true
