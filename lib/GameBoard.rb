@@ -1,4 +1,7 @@
 class GameBoard
+	attr_reader :rows
+	attr_accessor :black_pieces
+	attr_accessor :white_pieces
 	def create_rows
 		rows = []
 		8.times do |row_index| 
@@ -10,14 +13,20 @@ class GameBoard
 		return rows
 	end
 
-	def initialize
-		@squares = create_rows
+	def initialize(black_pieces = nil, white_pieces = nil, rows = nil)
+		unless rows
+			@rows = create_rows
+		else
+			@rows = rows
+		end
+		@black_pieces = black_pieces
+		@white_pieces = white_pieces
 	end
 
 	def square_at(coordinates)
 		if (coordinates[0] >= 0 && coordinates[0] < 8) &&
 		   (coordinates[1] >= 0 && coordinates[1] < 8)
-			return @squares[coordinates[0]][coordinates[1]]
+			return @rows[coordinates[0]][coordinates[1]]
 		else
 			return nil
 		end
