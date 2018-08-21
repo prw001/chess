@@ -48,6 +48,16 @@ module PieceMoves
 		return false
 	end
 
+	def checkmate(king, game)
+		if is_in_check(king.color, game, king.position) && 
+			(king.get_valid_moves == [])
+				return true
+		else
+			return false
+		end
+	end
+
+
 	def puts_in_check(color, moveset)
 
 	end
