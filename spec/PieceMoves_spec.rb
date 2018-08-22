@@ -68,7 +68,7 @@ describe 'PieceMoves' do
 		context 'when direction is NW' do 
 
 			it 'decrements the column and row values' do 
-				
+
 				expect(dummy_class.get_next_coordinates([7, 7], 'NW')).to eql([6, 6])
 			end
 		end
@@ -110,56 +110,6 @@ describe 'PieceMoves' do
 				king_two = game.square_at([0, 4]).occupant
 
 				expect(king_two.is_in_check(king_two.color, game, king_two.position)).to eql(false)
-			end
-		end
-	end
-
-	describe "#checkmate?" do 
-
-		context "when the King is in check" do 
-
-			context "when the King cannot move anywhere else" do 
-				game = GameBoard.new
-				rook_sq_one = game.square_at([0, 7])
-				rook_sq_two = game.square_at([1, 6])
-				king_square = game.square_at([7, 7])
-				rook_one = Rook.new(game, rook_sq_one, 'w')
-				rook_sq_one.occupant = rook_one
-				rook_two = Rook.new(game, rook_sq_two, 'w')
-				rook_sq_two.occupant = rook_two
-				king = King.new(game, king_square, 'b')
-				king_square.occupant = king
-
-				it "returns true" do 
-					expect(dummy_class.checkmate(king, game)).to eql(true)
-				end
-			end
-
-			context "when the King can move elsewhere out of check" do 
-				game = GameBoard.new
-				rook_sq_one = game.square_at([0, 7])
-				rook_sq_two = game.square_at([1, 6])
-				king_square = game.square_at([7, 6])
-				rook_one = Rook.new(game, rook_sq_one, 'w')
-				rook_sq_one.occupant = rook_one
-				rook_two = Rook.new(game, rook_sq_two, 'w')
-				rook_sq_two.occupant = rook_two
-				king = King.new(game, king_square, 'b')
-				king_square.occupant = king
-
-				it "returns false" do 
-					expect(dummy_class.checkmate(king, game)).to eql(false)
-				end
-			end
-		end
-
-		context "when the King is not in check" do 
-
-			it "returns false" do 
-				game = tools_class.create
-				king = game.square_at([0, 4]).occupant
-
-				expect(dummy_class.checkmate(king, game)).to eql(false)
 			end
 		end
 	end
