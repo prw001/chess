@@ -1,12 +1,12 @@
-require 'PieceMoves.rb'
-require 'GameTools.rb'
+require './PieceMoves.rb'
+require './GameBoard.rb'
+require './GameTools.rb'
+require 'colored2'
 
 class GamePiece
 	attr_reader :position
 	attr_reader :is_taken
 	attr_reader :color
-	include PieceMoves
-	include GameTools
 	def initialize(game, position, color)
 		@position = position
 		@is_taken = false
@@ -24,7 +24,6 @@ class GamePiece
 	end
 
 	def get_valid_moves(directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])
-		
 		moves = []
 		directions.each do |direction|
 			next_coord = @position.coordinates.dup
@@ -48,7 +47,7 @@ class GamePiece
 	end
 
 	def move(to_square)
-		if to_square.occupant
+		if to_square.occupant.instance_of? GamePiece
 			take_piece(to_square.occupant)
 		end
 		@position.occupant = nil
@@ -65,9 +64,9 @@ class Pawn < GamePiece
 		super(game, position, color)
 		@first_move = true
 		if @color == 'w'
-			@symbol = '♙'
+			@symbol = '♙ '.white
 		else
-			@symbol = '♟'
+			@symbol = '♟ '
 		end
 	end
 
@@ -89,7 +88,7 @@ class Pawn < GamePiece
 		end
 
 		2.times do |index| #diagonal attacks
-			origin = @position.coordinates
+			origin = @position.coordinates.dup
 			next_square = @game.square_at(get_next_coordinates(origin, directions[index + 1]))
 			if next_square && next_square.occupant && 
 			   next_square.occupant.color != @color
@@ -109,9 +108,9 @@ class Rook < GamePiece
 		super(game, position, color)
 		@first_move = true
 		if @color == 'w'
-			@symbol = '♖'
+			@symbol = '♖ '.white
 		else
-			@symbol = '♜'
+			@symbol = '♜ '
 		end
 	end
 
@@ -126,9 +125,9 @@ class Knight < GamePiece
 	def initialize(game, position, color)
 		super(game, position, color)
 		if @color == 'w'
-			@symbol = '♘'
+			@symbol = '♘ '.white
 		else
-			@symbol = '♞'
+			@symbol = '♞ '
 		end
 	end
 
@@ -159,9 +158,9 @@ class Bishop < GamePiece
 	def initialize(game, position, color)
 		super(game, position, color)
 		if @color == 'w'
-			@symbol = '♗'
+			@symbol = '♗ '.white
 		else
-			@symbol = '♝'
+			@symbol = '♝ '
 		end
 	end
 
@@ -172,12 +171,13 @@ end
 
 class Queen < GamePiece
 	attr_reader :symbol
+	include PieceMoves
 	def initialize(game, position, color)
 		super(game, position, color)
 		if @color == 'w'
-			@symbol = '♕'
+			@symbol = '♕ '.white
 		else
-			@symbol = '♛'
+			@symbol = '♛ '
 		end
 	end
 end
@@ -190,9 +190,9 @@ class King < GamePiece
 		super(game, position, color)
 		@first_move = true
 		if @color == 'w'
-			@symbol = '♔'
+			@symbol = '♔ '.white
 		else
-			@symbol = '♚'
+			@symbol = '♚ '
 		end
 	end
 
