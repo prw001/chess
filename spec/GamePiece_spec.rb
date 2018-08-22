@@ -1,9 +1,10 @@
 require 'GamePiece.rb'
 require 'GameBoard.rb'
 require 'PieceMoves.rb'
+require 'GameTools.rb'
 describe "GamePiece" do 
 
-	describe "#take_piece" do 
+	describe ".take_piece" do 
 
 		context "when one piece attacks another" do 
 			defending_piece = GamePiece.new(nil, [0, 0], 'b')
@@ -20,7 +21,7 @@ describe "GamePiece" do
 		end
 	end
 
-	describe "#get_valid_moves" do 
+	describe ".get_valid_moves" do 
 
 		context "when Queen is not blocked in any direction" do 
 
@@ -132,7 +133,7 @@ describe "GamePiece" do
 		end
 	end
 
-	describe "#move" do 
+	describe ".move" do 
 
 		context "when a piece is moved" do 
 			from_square = ChessSquare.new([0, 0])
@@ -166,7 +167,20 @@ end
 
 describe "Pawn" do
 
-	describe '#get_valid_moves' do 
+	let(:tools) {Class.new {extend GameTools}}
+	describe '.initialize' do 
+		context 'when an instance of pawn is made' do 
+			it 'has a position' do 
+				game = tools.create
+				origin = game.square_at([0, 0])
+				pawn = Pawn.new(game, origin, 'w')
+
+				expect(pawn.position).to be_an_instance_of(ChessSquare)
+			end
+		end
+	end
+
+	describe '.get_valid_moves' do 
 
 		context "when pawn's first move and pawn is not blocked" do 
 			game = GameBoard.new
@@ -260,7 +274,7 @@ end
 
 describe "Knight" do 
 
-	describe "#get_valid_moves" do 
+	describe ".get_valid_moves" do 
 
 		context "When knight is in center of board" do 
 
@@ -288,7 +302,7 @@ end
 
 describe "King" do 
 
-	describe "#get_valid_moves" do 
+	describe ".get_valid_moves" do 
 
 		context "When king is in center of empty board" do 
 
