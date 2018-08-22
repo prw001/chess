@@ -1,7 +1,6 @@
-require 'GameBoard.rb'
-require 'GamePiece.rb'
-require 'PieceMoves.rb'
-
+require './GameBoard.rb'
+require './GamePiece.rb'
+require './PieceMoves.rb'
 module GameTools
 	include PieceMoves
 	def deep_copy(rows)
@@ -12,8 +11,7 @@ module GameTools
 		return rows_copy
 	end
 
-	def create
-		game = GameBoard.new
+	def assemble(game)
 		black_pieces = [
 			Rook.new(game, game.square_at([0, 0]), 'b'),
 			Knight.new(game, game.square_at([0, 1]), 'b'),
@@ -66,6 +64,16 @@ module GameTools
 			return is_in_check('w', mock_game, game.white_pieces[4].position)
 		else
 			return is_in_check('b', mock_game, game.black_pieces[4].position)
+		end
+	end
+
+	def checkmate(king, game)
+		if is_in_check(king.color, game, king.position) && 
+			(king.get_valid_moves == [])
+				game.game_over = true
+				return true
+		else
+			return false
 		end
 	end
 end
