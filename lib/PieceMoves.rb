@@ -35,6 +35,7 @@ module PieceMoves
 	end
 
 	def is_in_check(kings_color, game, position)
+		#rewrite
 		game.rows.each do |row|
 			row.each do |square|
 				if square.occupant && square.occupant.color != kings_color
@@ -46,19 +47,5 @@ module PieceMoves
 			end
 		end
 		return false
-	end
-
-	def checkmate(king, game)
-		if is_in_check(king.color, game, king.position) && 
-			(king.get_valid_moves == [])
-				return true
-		else
-			return false
-		end
-	end
-
-
-	def puts_in_check(color, moveset)
-
 	end
 end
