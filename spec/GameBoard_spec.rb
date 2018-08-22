@@ -1,6 +1,6 @@
 require 'GameBoard.rb'
 game_board = GameBoard.new
-describe "#create_rows" do
+describe ".create_rows" do
 
 	rows = game_board.create_rows 
 
@@ -17,7 +17,7 @@ describe "#create_rows" do
 	end
 end
 
-describe "#square_at" do 
+describe ".square_at" do 
 	
 	context "given coordinates" do 
 		it "returns a square" do 
