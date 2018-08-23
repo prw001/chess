@@ -34,15 +34,36 @@ module PieceMoves
 		return [(set_one[0] + set_two[0]), (set_one[1] + set_two[1])]
 	end
 
+	def pawn_is_blocking(kings_color, game, square)
+		origin = square.coordinates.dup
+		if kings_color == 'w'
+			coord_shifts = [[-1, -1], [-1, 1]]
+		else
+			coord_shifts = [[1, -1], [1, 1]]
+		end
+		diagonals = [game.square_at(combine_coordinates(origin, coord_shifts[0])),
+	 				game.square_at(combine_coordinates(origin, coord_shifts[1]))]
+	 	diagonals.each do |diagonal|
+	 		if diagonal && (diagonal.occupant.instance_of? Pawn) && 
+	 		   diagonal.occupant.color != kings_color
+	 		   		return true
+	 		end
+	 	end
+	 	return false
+	end
+
 	def is_in_check(kings_color, game, position)
-		#rewrite
 		game.rows.each do |row|
 			row.each do |square|
-				if square.occupant && square.occupant.color != kings_color
-					moveset = square.occupant.get_valid_moves
+				if square.occupant && square.occupant.color != kings_color &&
+					!(square.occupant.instance_of? King) && !(square.occupant.instance_of? Pawn)
+						moveset = square.occupant.get_valid_moves
 					if moveset.include? position
 						return true
 					end
+				end
+				if pawn_is_blocking(kings_color, game, position)
+					return true
 				end
 			end
 		end
