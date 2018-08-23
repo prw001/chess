@@ -56,14 +56,17 @@ module GameTools
 	end
 
 	def puts_king_in_check(game, active_piece, destination)
-		mock_game = GameBoard.new(game.black_pieces, game.white_pieces, deep_copy(game.rows))
-		from_square = mock_game.square_at(active_piece.position.coordinates)
-		from_square.occupant = nil
-		mock_game.square_at(destination.coordinates).occupant = active_piece
+		mock_game = game.dup
+		mock_coords = active_piece.position.coordinates.dup
+		mock_piece = mock_game.square_at(mock_coords).occupant
+		mock_to = destination.coordinates.dup
+		mock_square = mock_game.square_at(mock_to)
+		mock_piece.move(mock_square)
+
 		if active_piece.color == 'w'
-			return is_in_check('w', mock_game, game.white_pieces[4].position)
+			return is_in_check('w', mock_game, mock_game.white_pieces[4].position)
 		else
-			return is_in_check('b', mock_game, game.black_pieces[4].position)
+			return is_in_check('b', mock_game, mock_game.black_pieces[4].position)
 		end
 	end
 
