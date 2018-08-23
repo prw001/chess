@@ -4,7 +4,7 @@ require './GameTools.rb'
 require 'colored2'
 
 class GamePiece
-	attr_reader :position
+	attr_accessor :position
 	attr_reader :is_taken
 	attr_reader :color
 	def initialize(game, position, color)
@@ -70,6 +70,11 @@ class Pawn < GamePiece
 		end
 	end
 
+	def move(to_square)
+		super
+		@first_move = false
+	end
+
 	def get_valid_moves
 		moveset = []
 		next_coord = @position.coordinates.dup
@@ -112,6 +117,11 @@ class Rook < GamePiece
 		else
 			@symbol = '♜ '
 		end
+	end
+
+	def move(to_square)
+		super
+		@first_move = false
 	end
 
 	def get_valid_moves(directions = ['N', 'E', 'S', 'W'])
@@ -196,15 +206,24 @@ class King < GamePiece
 		end
 	end
 
+	def move(to_square)
+		super
+		@first_move = false
+	end
+
 	def get_valid_moves(directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])
 		moveset = []
 		origin = @position.coordinates
 		directions.each do |direction|
 			next_square = @game.square_at(get_next_coordinates(origin, direction))
-			if next_square && next_square.occupant == nil && !(is_in_check(@color, @game, next_square))
-				moveset << next_square
+			if next_square && next_square.occupant == nil &&
+			   !(is_in_check(@color, @game, next_square)) &&
+			   !(pawn_is_blocking(@color, @game, next_square))
+					moveset << next_square
 			elsif next_square && next_square.occupant && 
-				  next_square.occupant.color != @color && !(is_in_check(@color, @game, next_square))
+				  next_square.occupant.color != @color &&
+				  !(is_in_check(@color, @game, next_square)) &&
+				  !(pawn_is_blocking(@color, @game, next_square))
 				  	moveset << next_square
 			else
 				next
