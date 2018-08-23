@@ -123,11 +123,15 @@ def turn(game)
 		king = game.white_pieces[4]
 	end
 
-	if is_in_check(king.color, game, king.position)
-		puts "Check!"
+	if checkmate(king, game)
+		puts "         " + "Checkmate!".bold.white.on.red
+	elsif is_in_check(king.color, game, king.position)
+		puts "         " + "Check!".bold.white.on.red
+		game.turn_over
+	else
+		game.turn_over
 	end
 
-	game.turn_over
 	puts "\n  " + "Move: ".on.green + piece.symbol.on.green + ": [".on.green +
 		  piece_coord.upcase.on.green + " => ".on.green +
 		  (piece.position.coordinates[0] + 97).chr.upcase.on.green +
