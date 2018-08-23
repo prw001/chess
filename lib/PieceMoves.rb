@@ -30,6 +30,10 @@ module PieceMoves
 		return next_coordinates
 	end
 
+	def difference_of_coordinates(set_one, set_two)
+		return [(set_one[0] - set_two[0]), (set_one[1] - set_two[1])]
+	end
+
 	def combine_coordinates(set_one, set_two)
 		return [(set_one[0] + set_two[0]), (set_one[1] + set_two[1])]
 	end
