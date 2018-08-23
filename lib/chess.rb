@@ -53,8 +53,6 @@ def bad_input(coord, game)
 		return true
 	when coord.length > 2
 		return true
-	when (game.square_at(to_coord_pair(coord)) == nil)
-		return true
 	else
 		return false
 	end
@@ -63,6 +61,8 @@ end
 def valid_piece(coord, game)
 	case true 
 	when bad_input(coord, game)
+		return false
+	when !(game.square_at(to_coord_pair(coord)).occupant)
 		return false
 	when game.player_turn == 1 && game.square_at(to_coord_pair(coord)).occupant.color != 'w'
 		return false
@@ -128,14 +128,15 @@ def turn(game)
 	end
 
 	game.turn_over
-	puts "\nMove: " + piece.symbol + ": ["+ piece_coord.upcase + " => " +
-					  (piece.position.coordinates[0] + 97).chr.upcase +
-					  (piece.position.coordinates[1] + 1).to_s + "]"
+	puts "\n  " + "Move: ".on.green + piece.symbol.on.green + ": [".on.green +
+		  piece_coord.upcase.on.green + " => ".on.green +
+		  (piece.position.coordinates[0] + 97).chr.upcase.on.green +
+		  (piece.position.coordinates[1] + 1).to_s.on.green + "]".on.green
 	game.display_with_options
 end
 
 def play(gameboard)
-	puts "Starting Board:\n"
+	puts "     Starting Board:\n".bold
 	gameboard.display_with_options
 
 	while !(gameboard.game_over)
