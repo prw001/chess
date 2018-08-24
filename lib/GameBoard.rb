@@ -1,9 +1,11 @@
 require 'colored2'
+require 'JSON'
+
 class GameBoard
 	attr_accessor :black_pieces
 	attr_accessor :white_pieces
 	attr_accessor :game_over
-	attr_reader :player_turn
+	attr_accessor :player_turn
 	attr_reader :rows
 	def create_rows
 		rows = []
@@ -28,6 +30,46 @@ class GameBoard
 		@game_over = false
 	end
 
+	def package_piece(piece)
+		label = ''
+		case 
+		when (piece.instance_of? Pawn)
+			label = 'pawn'
+			return [label, piece.position.coordinates, piece.color, piece.first_move]
+		when (piece.instance_of? Rook)
+			label = 'rook'
+			return [label, piece.position.coordinates, piece.color, piece.first_move]
+		when (piece.instance_of? Knight)
+			label = 'knight'
+		when (piece.instance_of? Bishop)
+			label = 'bishop'
+		when (piece.instance_of? Queen)
+			label = 'queen'
+		else
+			label = 'king'
+			return [label, piece.position.coordinates, piece.color, piece.first_move]
+		end
+		return [label, piece.position.coordinates, piece.color]
+	end
+
+	def save_data
+		black_set = []
+		@black_pieces.each do |piece|
+			unless piece.is_taken == true
+				black_set << package_piece(piece)
+			end
+		end
+
+		white_set= []
+		@white_pieces.each do |piece|
+			unless piece.is_taken == true || piece.position == nil
+				white_set << package_piece(piece)
+			end
+		end
+
+		return JSON.generate [black_set, white_set, @player_turn]
+	end
+
 	def turn_over
 		if @player_turn == 1
 			@player_turn = 2
@@ -49,9 +91,9 @@ class GameBoard
 		if row && column
 			if (row % 2 == 0 && column % 2 == 0) || 
 			   (row % 2 == 1 && column % 2 == 1)
-			   		return text.on.blue
+			   		return text.on.magenta
 			else
-				return text.on.magenta
+				return text.on.blue
 			end
 		else
 			return text.on.green
@@ -68,15 +110,15 @@ class GameBoard
 		while row >= 0
 			rows << "#{row_labels[row]} ┃ "
 			while column < 8
-				unless moveset && (moveset.include? square_at([row, column]))
-					if square_at([row, column]).occupant
-						symbol = color(square_at([row, column]).occupant.symbol, row, column)
+				unless moveset && (moveset.include? square_at([abs(row-7), column]))
+					if square_at([abs(row-7), column]).occupant
+						symbol = color(square_at([abs(row-7), column]).occupant.symbol, abs(row-7), column)
 					else
-					    symbol = color('  ', row, column)
+					    symbol = color('  ', abs(row-7), column)
 					end
 				else
-					if square_at([row, column]).occupant
-						symbol = color(square_at([row, column]).occupant.symbol)
+					if square_at([abs(row-7), column]).occupant
+						symbol = color(square_at([abs(row-7), column]).occupant.symbol)
 					else
 						symbol = color('  ')
 					end
