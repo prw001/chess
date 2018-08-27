@@ -33,23 +33,20 @@ $invalid_option = "Not a valid option. Please type one of the possible options o
 
 $how_to_play = ''
 
+$leaves_king_in_check = "That move leaves your king in check and is not legal. You must either:\n"+
+						"-Move the king to another location\n-Block the attacking piece\n"+
+						"-Take the attacking piece\n-Type 'back' to select another piece.\n"
+
 $turn_prompt = 'Select a piece to move, Player '
 
 $select_piece = "Type the coordinate of the piece you wish to move (e.g., A8, E5, B3, etc.): "
 
-$select_destination = "\nType the coordinate of the square you wish to move to (e.g., A8, E5, B3, etc.).\nOr type 'back' to select a different piece."
+$select_destination = "\nType the coordinate of the square you wish to move to (e.g., A8, E5, B3, etc.)."+
+					  "\nOr type 'back' to select a different piece."
 
 $valid_rows = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
 $possible_moves = "Potential squares to which this piece can move are highlighted in green:\n"
-
-def to_coord_pair(coord)
-	return [abs(coord[0].ord - 104), (coord[1].to_i - 1)]
-end
-
-def from_coord_pair(coord_pair)
-	return $valid_rows[(7 - coord_pair[0])].upcase + (coord_pair[1] + 1).to_s
-end
 
 def bad_input(coord, game)
 	case true
@@ -93,18 +90,17 @@ def valid_dest(piece, coord, moveset, game)
 		return true
 	when !(moveset.include? game.square_at(to_coord_pair(coord)))
 		return false
-	when puts_king_in_check(game, piece, game.square_at(to_coord_pair(coord)))
-		puts "That move leaves your king in check and is not legal. You must either:\n-Move the king\n-Block the attacking piece\n-Take the attacking piece\n-Type 'back' to select another piece.\n"
+	when puts_king_in_check(game, piece, (to_coord_pair(coord)))
+		puts $leaves_king_in_check
 		return false
 	else
 		return true
 	end	
 end
 
-def print_move(start, stop, piece)
-	puts "\n  " + "Move: ".on.green + piece.symbol.on.green + ": [".on.green +
-		  start.upcase.on.green + " => ".on.green +
-		  stop.upcase.on.green + "]".on.green
+def last_move(start, stop, piece)
+	move = "Move: #{piece.symbol.on.green} : [#{start.upcase} => #{stop.upcase}]"
+	return move
 end
 
 def move_piece(gameboard, dest_coord, piece)
@@ -112,9 +108,9 @@ def move_piece(gameboard, dest_coord, piece)
 	piece.move(destination)
 
 	if gameboard.player_turn == 1
-		king = gameboard.black_pieces[4]
+		king = gameboard.black_pieces.find{|piece| piece.instance_of? King}
 	else
-		king = gameboard.white_pieces[4]
+		king = gameboard.white_pieces.find{|piece| piece.instance_of? King}
 	end
 
 	if checkmate(king, gameboard)
@@ -195,7 +191,8 @@ def turn(gameboard)
 		turn(gameboard)
 	else
 		unless !destination
-			print_move(start_square, destination, option)
+			gameboard.game_log << last_move(start_square, destination, option)
+			puts gameboard.game_log[-1]
 			gameboard.display_with_options
 		end
 	end
@@ -207,6 +204,10 @@ def play(gameboard)
 
 	while !(gameboard.game_over)
 		turn(gameboard)
+	end
+	puts "     Moves:".bold
+	gameboard.game_log.each_with_index do |move, index|
+		puts "(#{index + 1}): #{move}"
 	end
 end
 
@@ -251,6 +252,7 @@ def menu
 			unless !data
 				game = assemble(GameBoard.new, data[0], data[1])
 				game.player_turn = data[2]
+				game.game_log = data[3]
 				chess(game)
 			else
 				puts "\nFailed to load game, try again or a different filename.\n".red
