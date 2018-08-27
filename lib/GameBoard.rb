@@ -6,6 +6,7 @@ class GameBoard
 	attr_accessor :white_pieces
 	attr_accessor :game_over
 	attr_accessor :player_turn
+	attr_accessor :game_log
 	attr_reader :rows
 	def create_rows
 		rows = []
@@ -18,7 +19,7 @@ class GameBoard
 		return rows
 	end
 
-	def initialize(black_pieces = nil, white_pieces = nil, rows = nil, player_turn = 1)
+	def initialize(black_pieces = nil, white_pieces = nil, rows = nil, player_turn = 1, game_log = [])
 		unless rows
 			@rows = create_rows
 		else
@@ -28,22 +29,23 @@ class GameBoard
 		@white_pieces = white_pieces
 		@player_turn = player_turn
 		@game_over = false
+		@game_log = game_log
 	end
 
 	def package_piece(piece)
 		label = ''
-		case 
-		when (piece.instance_of? Pawn)
+		case true
+		when (piece.is_a? Pawn)
 			label = 'pawn'
 			return [label, piece.position.coordinates, piece.color, piece.first_move]
-		when (piece.instance_of? Rook)
+		when (piece.is_a? Rook)
 			label = 'rook'
 			return [label, piece.position.coordinates, piece.color, piece.first_move]
-		when (piece.instance_of? Knight)
+		when (piece.is_a? Knight)
 			label = 'knight'
-		when (piece.instance_of? Bishop)
+		when (piece.is_a? Bishop)
 			label = 'bishop'
-		when (piece.instance_of? Queen)
+		when (piece.is_a? Queen)
 			label = 'queen'
 		else
 			label = 'king'
@@ -55,19 +57,19 @@ class GameBoard
 	def save_data
 		black_set = []
 		@black_pieces.each do |piece|
-			unless piece.is_taken == true
+			if piece.is_taken == false
 				black_set << package_piece(piece)
 			end
 		end
 
 		white_set= []
 		@white_pieces.each do |piece|
-			unless piece.is_taken == true || piece.position == nil
+			if piece.is_taken == false
 				white_set << package_piece(piece)
 			end
 		end
 
-		return JSON.generate [black_set, white_set, @player_turn]
+		return JSON.generate [black_set, white_set, @player_turn, @game_log]
 	end
 
 	def turn_over
