@@ -4,12 +4,14 @@ require './PieceMoves.rb'
 require 'JSON'
 
 $load_prompt = "Type the name of the save file (no extensions):\n"
+
 $rewrite_save_prompt = %s{There already exists a file with that name.  Continuing will overwrite the old save data.
 
 (1): Continue anyway and SAVE
 (2): Enter a different filename
 (3): Cancel
 Type the number of the option, then press 'Enter':}
+
 $invalid_save_option = "Not a valid option.  Please type one of the possible options or 'quit', and then press Enter:\n"
 
 module GameTools
@@ -31,6 +33,20 @@ module GameTools
 		else
 			return value
 		end
+	end
+
+	def to_coord_pair(coord)
+		return [abs(coord[0].ord - 104), (coord[1].to_i - 1)]
+	end
+
+	def from_coord_pair(coord_pair)
+		return $valid_rows[(7 - coord_pair[0])].upcase + (coord_pair[1] + 1).to_s
+	end
+
+	def retrieve_from_log(log)
+		dest_coord = to_coord_pair("#{log[-3].downcase}#{log[-2]}")
+		origin_coord = to_coord_pair("#{log[-9].downcase}#{log[-8]}")
+		return [dest_coord, origin_coord]
 	end
 
 	def clean_filename(filename)
@@ -135,7 +151,6 @@ module GameTools
 				Knight.new(game, game.square_at([0, 6]), 'b'),
 				Rook.new(game, game.square_at([0, 7]), 'b'),
 			]
-
 			8.times do |index|
 				black_pieces << Pawn.new(game, game.square_at([1, index]), 'b')
 			end
@@ -158,7 +173,6 @@ module GameTools
 				Knight.new(game, game.square_at([7, 6]), 'w'),
 				Rook.new(game, game.square_at([7, 7]), 'w'),
 			]
-
 			8.times do |index|
 				white_pieces << Pawn.new(game, game.square_at([6, index]), 'w')
 			end
@@ -166,7 +180,6 @@ module GameTools
 			white_pieces.each do |piece|
 				piece.position.occupant = piece
 			end
-
 			game.white_pieces = white_pieces
 			game.black_pieces = black_pieces
 		else
@@ -179,14 +192,16 @@ module GameTools
 		mock_game = game.dup
 		mock_coords = active_piece.position.coordinates.dup
 		mock_piece = mock_game.square_at(mock_coords).occupant
-		mock_to = destination.coordinates.dup
+		mock_to = destination.dup
 		mock_square = mock_game.square_at(mock_to)
 		mock_piece.move(mock_square)
 
 		if active_piece.color == 'w'
-			return is_in_check('w', mock_game, mock_game.white_pieces[4].position)
+			king = mock_game.white_pieces.find{|piece| piece.instance_of? King}
+			return is_in_check('w', mock_game, king.position)
 		else
-			return is_in_check('b', mock_game, mock_game.black_pieces[4].position)
+			king = mock_game.black_pieces.find{|piece| piece.instance_of? King}
+			return is_in_check('b', mock_game, king.position)
 		end
 	end
 
