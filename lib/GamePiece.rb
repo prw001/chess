@@ -47,10 +47,11 @@ class GamePiece
 	end
 
 	def move(to_square)
-		if to_square.occupant.instance_of? GamePiece
+		@position.occupant = nil
+
+		if to_square.occupant
 			take_piece(to_square.occupant)
 		end
-		@position.occupant = nil
 		@position = to_square
 		to_square.occupant = self
 	end
@@ -63,6 +64,7 @@ class Pawn < GamePiece
 	def initialize(game, position, color)
 		super(game, position, color)
 		@first_move = true
+		@can_en_passant = false
 		if @color == 'w'
 			@symbol = '♙ '.white
 		else
@@ -71,8 +73,34 @@ class Pawn < GamePiece
 	end
 
 	def move(to_square)
-		super
 		@first_move = false
+		
+		if @can_en_passant
+			dest_coord = to_square.coordinates
+			delta = difference_of_coordinates(@position.coordinates, dest_coord)
+			if abs(delta[0]) == 1 && abs(delta[1]) == 1 && !(to_square.occupant)
+				attack_coords = [@position.coordinates[0], (to_square.coordinates[1])]
+				take_piece(@game.square_at(attack_coords).occupant)
+				@game.square_at(attack_coords).occupant = nil
+			end
+			@can_en_passant = false
+		end
+		super
+	end
+
+	def en_passant
+		last_move_coords = retrieve_from_log(@game.game_log[-1])
+		current_coord = @position.coordinates
+		if (@game.square_at(last_move_coords[0]).occupant.instance_of? Pawn)
+			proximity = difference_of_coordinates(last_move_coords[0], current_coord)
+			move_distance = last_move_coords[1][0] - last_move_coords[0][0]
+			if (proximity[0] == 0 && abs(proximity[1]) == 1) && abs(move_distance) == 2
+				@can_en_passant = true
+				e_p_coords = [(current_coord[0] + (move_distance/2)), last_move_coords[0][1]]
+				return @game.square_at(e_p_coords)
+			end
+		end
+		return false
 	end
 
 	def get_valid_moves
@@ -95,10 +123,14 @@ class Pawn < GamePiece
 		2.times do |index| #diagonal attacks
 			origin = @position.coordinates.dup
 			next_square = @game.square_at(get_next_coordinates(origin, directions[index + 1]))
-			if next_square && next_square.occupant && 
-			   next_square.occupant.color != @color
+			if ((next_square && next_square.occupant && 
+			   next_square.occupant.color != @color))
 					moveset << next_square
 			end
+		end
+
+		if (@first_move == false && en_passant)
+			moveset << en_passant
 		end
 
 		return moveset
@@ -199,6 +231,7 @@ class King < GamePiece
 	def initialize(game, position, color)
 		super(game, position, color)
 		@first_move = true
+		@can_castle = false
 		if @color == 'w'
 			@symbol = '♔ '.white
 		else
@@ -229,6 +262,7 @@ class King < GamePiece
 				next
 			end
 		end
+		
 		return moveset
 	end
 end
