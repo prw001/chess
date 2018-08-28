@@ -227,11 +227,12 @@ end
 class King < GamePiece
 	attr_reader :symbol
 	attr_accessor :first_move
+	attr_accessor :can_castle
 	include PieceMoves
 	def initialize(game, position, color)
 		super(game, position, color)
 		@first_move = true
-		@can_castle = false
+		@can_castle = true
 		if @color == 'w'
 			@symbol = '♔ '.white
 		else
@@ -262,7 +263,9 @@ class King < GamePiece
 				next
 			end
 		end
-		
+		unless is_in_check(@color, @game, @position)
+			moveset += get_castle_squares(self, @game)
+		end
 		return moveset
 	end
 end
