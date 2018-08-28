@@ -31,7 +31,17 @@ $save_prompt = "Type a name for your save file (no special characters):\n"
 
 $invalid_option = "Not a valid option. Please type one of the possible options or 'quit', and then press Enter:\n"
 
-$how_to_play = ''
+$how_to_play = %s{How to Play:
+-Requires 2 Players
+-Enter the coordinates of the piece you wish to move, and then from the highlighted
+ squares on the board, enter the coordinate of the square to which you wish to move the piece.
+-If a normally valid move is contextually illegal (such as putting your own king into check),
+ the game will alert you that it is not a legal move, and ask you to make another.
+-Kings are allowed to castle, so long as the king and the castling rook have not been moved prior to castling.
+-En Passant is allowed for capturing pawns.
+-Game ends when a king is checkmated 
+
+}
 
 $leaves_king_in_check = "That move leaves your king in check and is not legal. You must either:\n"+
 						"-Move the king to another location\n-Block the attacking piece\n"+
@@ -208,6 +218,8 @@ def turn(gameboard)
 end
 
 def play(gameboard)
+	puts $how_to_play
+	sleep 1
 	puts "     Starting Board:\n".bold
 	gameboard.display_with_options
 
