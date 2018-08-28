@@ -104,8 +104,17 @@ def last_move(start, stop, piece)
 end
 
 def move_piece(gameboard, dest_coord, piece)
+	include PieceMoves
+	if (piece.instance_of? King) && (dest_coord[1] == '3' || dest_coord[1] == '7') && piece.can_castle
+		piece.can_castle = false
+		castle_rook(gameboard, to_coord_pair(dest_coord), piece)
+	end
+
 	destination = gameboard.square_at(to_coord_pair(dest_coord))
 	piece.move(destination)
+	if (piece.instance_of? King)
+		piece.can_castle = false
+	end
 
 	if gameboard.player_turn == 1
 		king = gameboard.black_pieces.find{|piece| piece.instance_of? King}
