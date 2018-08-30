@@ -61,11 +61,8 @@ module PieceMoves
 		king_dest[1] == 2 ? column = 0 : column = 7
 		king_dest[1] == 2 ? castle_column = 3 : castle_column = 5
 		castle_square = game.square_at([row, castle_column])
-		puts castle_square
 		rook = game.square_at([row, column]).occupant
-		puts rook
 		rook.move(castle_square)
-		puts rook.position.coordinates
 	end
 
 	def path_clear?(king, rook, game)
